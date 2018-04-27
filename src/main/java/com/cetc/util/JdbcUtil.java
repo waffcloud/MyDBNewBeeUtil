@@ -27,6 +27,11 @@ public class JdbcUtil {
 		}
 	}
 
+
+    public static JdbcUtil getInstance(){
+        return new JdbcUtil();
+    }
+
 	/**
 	 * 抽取获取连接对象的方法
 	 */

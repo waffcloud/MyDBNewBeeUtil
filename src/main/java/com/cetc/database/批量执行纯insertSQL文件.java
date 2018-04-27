@@ -1,5 +1,6 @@
 package com.cetc.database;
 
+import com.cetc.util.DBUtil;
 import com.cetc.util.JdbcUtil;
 
 import java.io.BufferedReader;
@@ -44,68 +45,22 @@ public class 批量执行纯insertSQL文件 {
     private static PreparedStatement pstmt = null;
     private static int SuccessCounter = 0;
     private static int FailCounter = 0;
-    private static HashSet<String> targetTableSet = null;
-    private static HashSet<String> sourceTableSet = null;
+    private static HashSet<String> targetTableSet = new HashSet<String>();
+    private static HashSet<String> sourceTableSet = new HashSet<String>();
 
 
     public static void main(String[] args) throws IOException, SQLException {
         init();
         //获取源数据库和目标数据库中所有表名（全部转换成小写）
-        getTargetDBAllTableNames();
-        getSourceDBAllTableNames();
+        //获取源数据库和目标数据库中所有表名（全部转换成小写）
+        DBUtil.getDBAllTableNames(targetTableSet, DB_name_target, conn_target);
+        DBUtil.getDBAllTableNames(sourceTableSet, DB_name_source, conn_source);
 
         ExecuteSQLFiles(folder_name_path);
 
         closeConn();
     }
 
-    /**
-     * 获取目标数据库的所有表名（table_name）组成的集合，以便于判断是否需要重新创建表结构
-     * （全部转换成小写）
-     *
-     * @return
-     * @throws SQLException
-     */
-    public static Set getTargetDBAllTableNames() throws SQLException {
-        targetTableSet = new HashSet<String>();
-        String sql = "SELECT table_name from information_schema.TABLES WHERE table_schema = '" + DB_name_target + "';";
-        PreparedStatement pstmt1 = conn_target.prepareStatement(sql);
-        ResultSet rs = pstmt1.executeQuery();
-        while (rs.next()) {
-            String tb_name = rs.getString("table_name");
-            targetTableSet.add(tb_name.toLowerCase());
-        }
-        if (targetTableSet.size() > 0) {
-            return targetTableSet;
-        } else {
-            System.out.println("当前目标库为空!!!");
-            return null;
-        }
-    }
-
-    /**
-     * 获取源数据库的所有表名（table_name）组成的集合，以便于判断是否需要重新创建表结构
-     * （全部转换成小写）
-     *
-     * @return
-     * @throws SQLException
-     */
-    public static Set getSourceDBAllTableNames() throws SQLException {
-        sourceTableSet = new HashSet<String>();
-        String sql = "SELECT table_name from information_schema.TABLES WHERE table_schema = '" + DB_name_source + "';";
-        PreparedStatement pstmt1 = conn_source.prepareStatement(sql);
-        ResultSet rs = pstmt1.executeQuery();
-        while (rs.next()) {
-            String tb_name = rs.getString("table_name");
-            sourceTableSet.add(tb_name);
-        }
-        if (sourceTableSet.size() > 0) {
-            return sourceTableSet;
-        } else {
-            System.out.println("当前目标库为空!!!");
-            return null;
-        }
-    }
 
     /***
      * 只执行SQL的insert操作，前提是表结构必须建立好
@@ -121,7 +76,7 @@ public class 批量执行纯insertSQL文件 {
         int coun = 0;
         for (File f : files) {
             String fName = f.getName();
-            CheckAndPerfectTargetDbDDL(fName.toLowerCase().split("\\.")[0]);
+            CreateOrTruncateTargetTable(fName.toLowerCase().split("\\.")[0]);
             coun++;
         }
         System.out.println("\r\n################                         ###############");
@@ -146,11 +101,9 @@ public class 批量执行纯insertSQL文件 {
                 PreparedStatement pstmt = conn_target.prepareStatement(sqlString);
                 int i = pstmt.executeUpdate();
                 if (i > 0) {
-//                    System.out.println("\t\tsuccess!" + singleFileSqlCounter_success++);
                     singleFileSqlCounter_success++;
                     SuccessCounter++;
                 } else {
-//                    System.out.println("\t\tfail!" + singleFileSqlCounter_fail++);
                     singleFileSqlCounter_fail++;
                     FailCounter++;
                 }
@@ -175,7 +128,7 @@ public class 批量执行纯insertSQL文件 {
      * @throws SQLException
      * @throws IOException
      */
-    public static void CheckAndPerfectTargetDbDDL(String tableName) throws SQLException, IOException {
+    public static void CreateOrTruncateTargetTable(String tableName) throws SQLException, IOException {
         String DDL = null;
         //todo:1.检查tagetDB是否存在这张表
         if (!targetTableSet.contains(tableName)) {//todo:2.没有的话从source数据库拿到DDL进行建表
