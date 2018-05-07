@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,7 +19,8 @@ public class DBUtil {
      * @return
      * @throws SQLException
      */
-    public static Set getDBAllTableNames(Set allTableNameSet, String DB_name, Connection conn_target) throws SQLException {
+    public static Set getDBAllTableNames(String DB_name, Connection conn_target) throws SQLException {
+        Set allTableNameSet = new HashSet();
         String sql = "SELECT table_name from information_schema.TABLES WHERE table_schema = '" + DB_name + "';";
         PreparedStatement pstmt1 = conn_target.prepareStatement(sql);
         ResultSet rs = pstmt1.executeQuery();

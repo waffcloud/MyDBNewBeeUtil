@@ -21,7 +21,8 @@ public class BatchFillCoordinate_Gaode {
     private static PreparedStatement pstmt = null;
     private static long counter = 1;
 
-    private static String IP = "192.168.16.54";
+    private static String IP = "192.168.16.220";//研发组互联网测试机
+//    private static String IP = "localhost";
     private static String DB_name = "31project_april";
     private static String username = "root";
     private static String password = "123456";
@@ -35,7 +36,7 @@ public class BatchFillCoordinate_Gaode {
 
         init();
         try {
-            fillCoordinate_84("tb_fire_danger", 650);
+            fillCoordinate_84("xiaohuoshuan_001", 3);
         } catch (Exception e) {
             System.out.println("error");
             e.printStackTrace();
@@ -52,7 +53,7 @@ public class BatchFillCoordinate_Gaode {
             String wd = null;
             for (int i = 1; i <= tableSize; i++) {
                 //todo:1.查询：商铺楼栋+商铺名称（address+organization_name）
-                String querySQL = "SELECT address,organization_name FROM " + table_name + " WHERE id=" + i;
+                String querySQL = "SELECT address FROM " + table_name + " WHERE id=" + i;
                 PreparedStatement preparedStatement = conn.prepareStatement(querySQL);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -60,10 +61,9 @@ public class BatchFillCoordinate_Gaode {
                 String organization_name = null;
                 while (resultSet.next()) {
                     address = resultSet.getString(1);
-                    organization_name = resultSet.getString(2);
                 }
 
-                String param_address = "金地工业区 " + address + " " + organization_name;
+                String param_address = "沙头街道 " + address + " " ;
 
                 //todo:2.根据 商铺楼栋+商铺名称 获取高德经纬度
                 String coordinates_gaode = GaodeMapUtil.getOnlineCoordinates(param_address, "深圳").getJSONObject("data").getJSONArray("geocodes").getJSONObject(0).getString("location");

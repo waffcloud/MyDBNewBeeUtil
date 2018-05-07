@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class source_target两库对导工具 {
 
-    /************************  配置工具 ******************************************/
+    /************************  配置信息 ******************************************/
     /**
      * source:源数据库
      **/
@@ -58,8 +58,8 @@ public class source_target两库对导工具 {
 
     private static int SuccessCounter = 0;
     private static int FailCounter = 0;
-    private static Set<String> targetTableSet = new HashSet<String>();
-    private static Set<String> sourceTableSet = new HashSet<String>();
+    private static Set<String> targetTableSet ;
+    private static Set<String> sourceTableSet ;
 
     private static final Logger logger = LoggerFactory.getLogger(source_target两库对导工具.class);
 
@@ -72,8 +72,8 @@ public class source_target两库对导工具 {
         init();
 
         //获取源数据库和目标数据库中所有表名（全部转换成小写）
-        DBUtil.getDBAllTableNames(targetTableSet, DB_name_target, conn_target);
-        DBUtil.getDBAllTableNames(sourceTableSet, DB_name_source, conn_source);
+        targetTableSet = DBUtil.getDBAllTableNames( DB_name_target, conn_target);
+        sourceTableSet = DBUtil.getDBAllTableNames( DB_name_source, conn_source);
 
         try {
             URL url = source_target两库对导工具.class.getClassLoader().getResource(ConfigFilePath);

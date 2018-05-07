@@ -3,8 +3,6 @@ package com.cetc.GIS;
 
 import com.cetc.util.CoordinateTransformer;
 import com.cetc.util.JdbcUtil;
-import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -174,7 +172,6 @@ public class BatchFillCoordinate_Baidu {
         JdbcUtil.close(conn, pstmt);
     }
 
-    @Test
     public void test() {
         String name = " 南山实验 教育集  团鼎   太小学 ";
         String s = name.replaceAll(" ", "");

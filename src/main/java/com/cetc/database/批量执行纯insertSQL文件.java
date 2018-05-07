@@ -45,16 +45,16 @@ public class 批量执行纯insertSQL文件 {
     private static PreparedStatement pstmt = null;
     private static int SuccessCounter = 0;
     private static int FailCounter = 0;
-    private static HashSet<String> targetTableSet = new HashSet<String>();
-    private static HashSet<String> sourceTableSet = new HashSet<String>();
+    private static Set<String> targetTableSet;
+    private static Set<String> sourceTableSet;
 
 
     public static void main(String[] args) throws IOException, SQLException {
         init();
         //获取源数据库和目标数据库中所有表名（全部转换成小写）
         //获取源数据库和目标数据库中所有表名（全部转换成小写）
-        DBUtil.getDBAllTableNames(targetTableSet, DB_name_target, conn_target);
-        DBUtil.getDBAllTableNames(sourceTableSet, DB_name_source, conn_source);
+        targetTableSet = DBUtil.getDBAllTableNames( DB_name_target, conn_target);
+        sourceTableSet = DBUtil.getDBAllTableNames( DB_name_source, conn_source);
 
         ExecuteSQLFiles(folder_name_path);
 

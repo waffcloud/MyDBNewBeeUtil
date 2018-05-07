@@ -15,17 +15,23 @@ import java.util.Calendar;
  */
 public class 批量更新uuid和create_time {
 
-    //平台组 数据库ip    //用户名   //密码    //数据库名称
-    private static String db_ip = "192.168.16.103";
-    private static String user = "root";
-    private static String password = "pingtaizu972";
-    private static String db_name = "db_31project";
+    //数据库ip    //用户名   //密码    //数据库名称
+//    private static String db_ip = "192.168.16.103";
+//    private static String user = "root";
+//    private static String password = "pingtaizu972";
+//    private static String db_name = "db_31project";
 
     //31_project_alpha 数据库ip    //用户名   //密码
 //    private static String db_ip = "10.0.12.189";
 //    private static String user = "root";
 //    private static String password = "centos";
 //    private static String db_name = "db_31project_alpha";
+
+//    31_project_april 数据库ip    //用户名   //密码  //数据库名称
+    private static String db_ip = "192.168.16.220";
+    private static String user = "root";
+    private static String password = "123456";
+    private static String db_name = "31project_april";
 
     private static String url = "jdbc:mysql://"+db_ip+":3306/" + db_name + "?tinyInt1isBit=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull";
     private static Connection conn = null;
@@ -36,7 +42,7 @@ public class 批量更新uuid和create_time {
         init();
 //        printAllTables(db_name);
 //        updateUuIdAndCreateTime(db_name);
-        updateUuId("SHUIKUYUSHUIQING_001");
+        updateUuId("xiaohuoshuan_001");
 //        updateUuId("XIAOFANGZHAN_001");
         closeConn();
     }

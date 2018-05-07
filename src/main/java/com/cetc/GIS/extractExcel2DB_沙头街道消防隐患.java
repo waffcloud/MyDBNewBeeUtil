@@ -6,9 +6,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +41,6 @@ public class extractExcel2DB_沙头街道消防隐患 {
     private static long counter = 1;
     private static String FileNameStr = "C:\\Users\\Administrator\\Desktop\\2018年金地工业区第一季度企业商铺检查.xls";
 
-    @Test
     public void extractExcel2DB() throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(FileNameStr)));
         HSSFSheet sheet = null;
@@ -121,12 +117,10 @@ public class extractExcel2DB_沙头街道消防隐患 {
 //    }
 
     // 读取，指定sheet表及数据
-    @Before
     public void init() throws Exception {
         conn = JdbcUtil.getConnection();
     }
 
-    @After
     public void close() throws Exception {
         conn.close();
     }

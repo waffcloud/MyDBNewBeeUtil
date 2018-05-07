@@ -1,7 +1,7 @@
 package com.cetc.util;
 
 /**
- * Description：
+ * Description：坐标转换工具
  * Created by luolinjie on 2018/4/18.
  */
 public class CoordinateTransformer {

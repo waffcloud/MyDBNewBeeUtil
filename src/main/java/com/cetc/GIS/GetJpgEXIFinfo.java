@@ -73,10 +73,10 @@ public class GetJpgEXIFinfo {
                     Metadata metadata = JpegMetadataReader.readMetadata(jpgFile);
                     for (Directory directory : metadata.getDirectories()) {
                         for (Tag tag : directory.getTags()) {
-                            if ("GPS Latitude".equals(tag.getTagName())) {
+                            if ("GPS Longitude".equals(tag.getTagName())) {
                                 jpegFileModel.setJd84(translate(tag.getDescription()));
                             }
-                            if ("GPS Longitude".equals(tag.getTagName())) {
+                            if ("GPS Latitude".equals(tag.getTagName())) {
                                 jpegFileModel.setWd84(translate(tag.getDescription()));
                             }
                             if ("Date/Time Original".equals(tag.getTagName())) {
