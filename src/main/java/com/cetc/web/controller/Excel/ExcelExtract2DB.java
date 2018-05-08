@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -123,6 +124,8 @@ public class ExcelExtract2DB {
         conn.close();
         return "插入数据总数：" + counter;
     }
+
+
 
 
     // 读取，指定sheet表及数据

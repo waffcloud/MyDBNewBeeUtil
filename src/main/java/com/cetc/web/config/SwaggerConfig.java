@@ -55,8 +55,8 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter implements SwaggerCon
 //        registry.addResourceHandler("/webjars/**")
 //                .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
-//        registry.addResourceHandler("/test/**")
-//                .addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/");
 
 //        registry.addResourceHandler("swagger-ui.html")
 //                .addResourceLocations("classpath:/META-INF/resources/");
