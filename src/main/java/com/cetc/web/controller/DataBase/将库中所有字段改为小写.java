@@ -1,4 +1,4 @@
-package com.cetc.core.database;
+package com.cetc.web.controller.DataBase;
 
 import com.cetc.core.util.DBUtil;
 import com.cetc.core.util.JdbcUtil;
@@ -29,7 +29,7 @@ public class 将库中所有字段改为小写 {
     private static String DB_name_source = "test";
     private static String user_source = "root";
     private static String password_source = "123456";*/
-    private static String IP_source = "192.168.16.220";
+    private static String IP_source = "192.168.16.195";
     private static String DB_name_source = "31project_april";
     private static String user_source = "root";
     private static String password_source = "123456";
@@ -97,9 +97,9 @@ public class 将库中所有字段改为小写 {
         Set set = new HashSet();
 
         String[] tableArray = {
-                "dixiandian_001",
-                "hedianzhan_001",
-                "shuiku_001"
+                "anquanbiaozhunhuaqiye_001",
+                "weihuapinqiye_001",
+                "weihuo_renyuan_001"
         };
 
         for (int i=0;i<tableArray.length;i++){

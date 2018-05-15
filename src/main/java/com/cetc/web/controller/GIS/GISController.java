@@ -3,6 +3,7 @@ package com.cetc.web.controller.GIS;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cetc.core.util.CoordinateTransformer;
+import com.cetc.core.util.GaodeMapUtil;
 import com.cetc.core.util.HttpUtil;
 import com.cetc.core.util.JdbcUtil;
 import com.cetc.web.controller.model.JpegFileModel;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 
@@ -39,12 +41,113 @@ public class GISController {
     private static PreparedStatement pstmt = null;
 
     private static String IP = "localhost";
-    private static String DB_name = "test_xiaofangyinhuan";
-    private static String BaseTable = "tb_fire_danger";
+    private static String DB_name = "test";
+    private static String BaseTable = "tb_yilaodian";
     private static String username = "root";
     private static String password = "123456";
+    private static void init(String DB_name) {
+        String url1 = "jdbc:mysql://" + IP + ":3306/" + DB_name + "?tinyInt1isBit=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull";
+        conn = JdbcUtil.getConnection(url1, username, password);
+    }
+
+    /**
+     * 指定表中已有的地址字段名进行地址解析，并填充84坐标
+     * @param table_name
+     * @param targetColumn1  小范围
+     * @param targetColumn2  大范围
+     * @param tableSize
+     * @throws SQLException
+     */
+    @RequestMapping(value = "/fillCoordinate_84", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String fillCoordinate_84(String table_name,String targetColumn1,String targetColumn2) throws SQLException {
+        init(DB_name);
+        try {
+            int counter =0;
+            String longitude84 = null;
+            String latitude84 = null;
+            String jd = null;
+            String wd = null;
+            String addressStr = null;
+
+            //todo:统计表的条数
+            String querySQL0 = "SELECT COUNT(1) FROM " + table_name;
+            PreparedStatement preparedStatement0 = conn.prepareStatement(querySQL0);
+            ResultSet resultSet0 = preparedStatement0.executeQuery();
+
+            long count = 0;
+            while (resultSet0.next()) {
+                count = resultSet0.getLong(1);
+            }
+            logger.info("this table has "+count+" records,start to analyze address to coordinates");
+
+            if (targetColumn1==null && targetColumn2!=null){
+                addressStr=targetColumn2;
+            }else if (targetColumn1!=null && targetColumn2==null){
+                addressStr=targetColumn1;
+            }else if (targetColumn1!=null && targetColumn2!=null){
+                addressStr=targetColumn1+","+targetColumn2;
+            }
 
 
+            for (int i = 1; i <= count; i++) {
+                //todo:1.查询 地址相关字段
+                String querySQL = "SELECT "+addressStr+" FROM " + table_name + " WHERE id=" + i;
+                PreparedStatement preparedStatement = conn.prepareStatement(querySQL);
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                String address1 = null;
+                String address2 = null;
+                while (resultSet.next()) {
+                    address1 = resultSet.getString(1);
+                    address2 = resultSet.getString(2);
+                }
+
+                String param_address =  address1 + " "+address2 ;
+
+                //todo:2.根据 商铺楼栋+商铺名称 获取高德经纬度
+                String coordinates_gaode = GaodeMapUtil.getOnlineCoordinates(param_address, "深圳").getJSONObject("data").getJSONArray("geocodes").getJSONObject(0).getString("location");
+
+                String[] lng_lat = coordinates_gaode.split(",");
+                if (lng_lat.length != 2) {
+                    logger.error("解析地址：获取高德经纬度失败！ 当前id：" + i);
+                    continue;
+                }
+
+                //获取到经纬度
+                jd = lng_lat[0];
+                wd = lng_lat[1];
+
+                //todo:3.解析经纬度坐标  gaode --> 84
+                double[] trans_res = CoordinateTransformer.gcj02_to_wgs84(Double.parseDouble(jd), Double.parseDouble(wd));
+                longitude84 = String.valueOf(trans_res[0]);
+                latitude84 = String.valueOf(trans_res[1]);
+
+                //todo:4.更新 高德、84 两类坐标
+                String sql = "UPDATE " + table_name + " SET jd='" + jd + "',wd='" + wd + "' ,jd84='" + longitude84 + "',wd84='" + latitude84 + "' WHERE id=" + i;
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                int count1 = pstmt.executeUpdate();
+                if (count1 > 0) {
+                    System.out.println("SUCCESS! " + i + " >> "+param_address+" >>[ " + longitude84 + "," + latitude84 + " ]--\n\r更新总记录数" + counter++);
+                }
+            }
+
+            return "finished";
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * 获取图片中经纬度坐标
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws JpegProcessingException
+     * @throws ParseException
+     */
     @RequestMapping(value = "/getImageFileAddress", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
     public JSONObject getImageFileAddress(MultipartFile file) throws IOException, JpegProcessingException, ParseException {
@@ -90,6 +193,15 @@ public class GISController {
         return result;
     }
 
+    /**
+     * 手动填充经纬度
+     * @param DbName
+     * @param targetTable
+     * @param id
+     * @param coordinateStr
+     * @return
+     * @throws SQLException
+     */
     @RequestMapping(value = "/fillCoordinateInfo", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
     public String fillCoordinateInfo(String DbName, String targetTable, int id, String coordinateStr) throws SQLException {
@@ -121,6 +233,12 @@ public class GISController {
 
     }
 
+    /**
+     * 测试接口：通过经纬度反向解析出地址
+     * @param jd84
+     * @param wd84
+     * @return
+     */
     private JSONObject getLocationNameByCoordinate(String jd84, String wd84) {
         String httpURL = TiandituURL + "?postStr={%27lon%27:" + jd84 + ",%27lat%27:" + wd84 + ",%27appkey%27:8a7b9aac0db21f9dd995e61a14685f05,%27ver%27:1}&type=geocode";
 
@@ -156,7 +274,7 @@ public class GISController {
     }
 
     /**
-     * 转换经纬度进制
+     * 转换经纬度进制-- 度分秒 -> 统一小数格式
      * 举例：22.0° 31.0' 25.56000000000097"
      * result = 22.0+31.0/60+25.5600000000097/3600
      *
