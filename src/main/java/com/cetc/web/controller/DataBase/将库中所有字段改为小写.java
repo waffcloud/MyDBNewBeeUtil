@@ -75,7 +75,7 @@ public class 将库中所有字段改为小写 {
                 String columnType = rs1.getString(2);
                 String columnComment = rs1.getString(3);
 
-                System.out.println("colunmName --> "+columnName);
+               logger.info("colunmName --> "+columnName);
                 //如果字段名称已经是小写的话，就不做修改
                 if (columnName.equals(columnName.toLowerCase())){
                     continue;

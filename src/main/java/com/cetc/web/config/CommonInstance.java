@@ -41,4 +41,8 @@ public interface CommonInstance {
      *
      * */
     String Alias = "/global_map_search";
+
+
+    String ShenzhenGISURL = "http://192.168.37.134:8080/ConvertCoord/servlet/local2wgs";
+
 }

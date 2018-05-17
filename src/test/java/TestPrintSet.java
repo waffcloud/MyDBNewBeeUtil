@@ -9,11 +9,18 @@ import java.util.HashSet;
  */
 public class TestPrintSet {
     public  static  void main(String[] args) throws ParseException {
-        String date = "2017:04:27 17:00:00";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-        Date parse = simpleDateFormat.parse(date);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String format = sdf.format(parse);
-        System.out.println(format);
+//        String date = "2017:04:27 17:00:00";
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+//        Date parse = simpleDateFormat.parse(date);
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String format = sdf.format(parse);
+//        System.out.println(format);
+
+        String resString = "<Result>sdfsfsh</Result>";
+
+        String s = resString.split("</")[0];
+        String s1 = s.split(">")[1];
+        System.out.println(s1);
+
     }
 }
